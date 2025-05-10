@@ -3,6 +3,8 @@ package me.akashmaji.directory.explorer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.MalformedInputException;
 import java.nio.file.*;
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -18,6 +20,9 @@ public class Explorer {
 
     // DONE: Define a global list in a csv or .txt file
     List<String> extensionsAllowed;
+
+    public Explorer() {
+    }
 
     public Explorer(String rootDirectory, String extensionsFile) {
         this.rootDirectory = rootDirectory;
@@ -56,20 +61,28 @@ public class Explorer {
 
     }
 
-    private void printFileContents(Path path) throws IOException {
+    public void printFileContents(Path path) throws IOException {
         assert Files.isRegularFile(path) : Color.red(" >>> ERROR: The provided path is NOT a file: " + path);
         boolean isProcessable = checkProcessableFile(path);
         if(isProcessable) {
-                // using modern Java (read and print at once)
-                String dataContents = Files.readString(path);
+            try {
+                Charset charset = EncodingDetector.detectEncoding(path);
+                String dataContents = Files.readString(path, charset);
                 System.out.println(dataContents);
+            } catch (MalformedInputException e) {
+                Color.out.println(Color.red(" >>> ERROR: Malformed input - could not decode file: " + path.toAbsolutePath()));
+            } catch (IOException e) {
+                Color.out.println(Color.red(" >>> ERROR: I/O error reading file: " + path.toAbsolutePath() + " - " + e.getMessage()));
+            } catch (Exception e) {
+                Color.out.println(Color.red(" >>> ERROR: Unexpected error: " + path.toAbsolutePath() + " - " + e.getMessage()));
+            }
         }else{
 //            System.out.println("WARN: The provided file is not a processable file: " + path.toAbsolutePath());
             Color.out.println(Color.yellow("WARN: The provided file is not a processable file: " + path.toAbsolutePath()));
         }
     }
 
-    private boolean checkProcessableFile(Path path) {
+    public boolean checkProcessableFile(Path path) {
         assert Files.isRegularFile(path) : Color.red(" >>> ERROR: The provided path is NOT a file: " + path);
         String fileName = path.getFileName().toString();
         String fileExtension = fileName.substring(fileName.contains(".") ? fileName.lastIndexOf(".") : fileName.length());
@@ -94,7 +107,7 @@ public class Explorer {
 
     }
 
-    private void printFullName(Path path, boolean isDirectory) throws IOException {
+    public void printFullName(Path path, boolean isDirectory) throws IOException {
         if(isDirectory) {
 //            System.out.println("DIR: " + path.toAbsolutePath());
             Color.out.println(Color.blue("DIR: " + path.toAbsolutePath()));
@@ -122,7 +135,7 @@ public class Explorer {
                 if (Files.isDirectory(sourcePath)) {
                     // Recurse into subdirectory
                     saveAllFiles(sourcePath, targetPath);
-                } else if (checkProcessableFile(sourcePath)) {
+                } else if (Files.isRegularFile(targetPath)) {
                     // Ensure parent directories exist
                     Files.createDirectories(targetPath.getParent());
                     Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
@@ -132,6 +145,28 @@ public class Explorer {
                 }
             }
         }
+    }
+
+    public boolean checkForSameNumberOfFiles(Path firstDir, Path secondDir) throws IOException {
+        boolean hasSameNumberOfFiles = true;
+        try (DirectoryStream<Path> streamFirstDir = Files.newDirectoryStream(firstDir)) {
+            for (Path sourcePath : streamFirstDir) {
+                Path relativePath = firstDir.relativize(sourcePath);
+                Path targetPath = secondDir.resolve(relativePath);
+
+                if(Files.isDirectory(sourcePath) && Files.isDirectory(targetPath)) {
+                    boolean check = checkForSameNumberOfFiles(sourcePath, targetPath);
+                    hasSameNumberOfFiles = hasSameNumberOfFiles && check;
+                }else if(Files.isRegularFile(targetPath) && Files.isRegularFile(sourcePath)) {
+                    // ok
+                }else{
+                    return false;
+                }
+            }
+        }
+
+        return hasSameNumberOfFiles;
+
     }
 
 

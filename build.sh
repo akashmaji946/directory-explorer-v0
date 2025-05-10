@@ -12,7 +12,10 @@ rm -rf "$OUT_DIR" "$JAR_NAME"
 # Step 1: Compile Java files
 echo ">>> Compiling Java source files..."
 mkdir -p "$OUT_DIR"
-javac -d "$OUT_DIR" "$SRC_DIR/me/akashmaji/directory/Main.java" "$SRC_DIR/me/akashmaji/directory/explorer/"*.java
+javac -d "$OUT_DIR" "$SRC_DIR/me/akashmaji/directory/Main.java" \
+                    "$SRC_DIR/me/akashmaji/directory/explorer/"*.java \
+                    "$SRC_DIR/me/akashmaji/directory/crypto/"*.java
+
 
 # Step 2: Package into JAR
 echo ">>> Creating JAR file..."

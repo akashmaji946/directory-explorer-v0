@@ -37,4 +37,9 @@ jar cfm directory.jar manifest.txt -C out/production/DirectoryExplorer .
 java -jar directory.jar src
 
 
+# --------------------------
+javac -cp src -d out/production/DirectoryExplorer src/me/akashmaji/directory/crypto/ShiftCipherTest.java
+java -cp out/production/DirectoryExplorer me.akashmaji.directory.crypto.ShiftCipherASCIITest
+
+
 
