@@ -10,7 +10,7 @@ It will do the following:
 - Setup as: 
 ```bash
 cd ~/Desktop
-git clone <this repo url>
+git clone <this repo url> DirectoryExplorer
 cd ~/Desktop/DirectoryExplorer
 
 mkdir -p out/production/DirectoryExplorer

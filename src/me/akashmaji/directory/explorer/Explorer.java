@@ -2,6 +2,7 @@ package me.akashmaji.directory.explorer;
 
 import java.io.IOException;
 import java.nio.file.*;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -50,10 +51,10 @@ public class Explorer {
     }
 
     private boolean checkProcessableFile(Path path) {
-        assert Files.isRegularFile(path) : " >>> ERROR: The provided path is NOT a file: " + path;
+        assert Files.isRegularFile(path) : " >>> ERROR: The provided path is NOT a regular file: " + path;
         String fileName = path.getFileName().toString();
-        String fileExtension = fileName.substring(fileName.lastIndexOf("."));
-
+        String fileExtension = fileName.substring(fileName.contains(".") ? fileName.lastIndexOf(".") : fileName.length());
+        // System.out.println(fileExtension);
         // allowed extensions (e.g., ".txt", ".java", ".py", ".c", ".cpp", ".h", ".js", ".html",
         // ".css", ".xml", ".json", ".md", ".sh", ".bat").
 
