@@ -1,0 +1,40 @@
+# Navigate
+cd ~/IdeaProjects/DirectoryExplorer
+
+# Make sure the output directory exists
+mkdir -p out/production/DirectoryExplorer
+
+# Compile your Main.java (and any other .java files)
+# Replace with the actual path to your Main.java if different
+javac -d out/production/DirectoryExplorer src/me/akashmaji/directory/Main.java
+
+# Run as:
+java -cp out/production/DirectoryExplorer me.akashmaji.directory.Main src
+
+# ------------------------------------------------------------------------------
+
+# Navigate
+cd ~/IdeaProjects/DirectoryExplorer
+
+# Make sure the output directory exists
+mkdir -p out/production/DirectoryExplorer
+
+# Compile
+javac -d out/production/DirectoryExplorer src/me/akashmaji/directory/Main.java
+
+# Build the jar:
+jar cfm directory.jar manifest.txt -C out/production/DirectoryExplorer .
+
+# Run the jar as:
+java -jar directory.jar <directory>
+
+
+# ---------------------------------------
+cd ~/IdeaProjects/DirectoryExplorer
+mkdir -p out/production/DirectoryExplorer
+javac -d out/production/DirectoryExplorer src/me/akashmaji/directory/*.java src/me/akashmaji/directory/explorer/*.java
+jar cfm directory.jar manifest.txt -C out/production/DirectoryExplorer .
+java -jar directory.jar src
+
+
+
