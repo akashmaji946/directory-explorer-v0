@@ -75,9 +75,8 @@ public class Explorer {
         String fileExtension = fileName.substring(fileName.contains(".") ? fileName.lastIndexOf(".") : fileName.length());
 
         // System.out.println(fileExtension);
-        // allowed extensions (e.g., ".txt", ".java", ".py", ".c", ".cpp", ".h", ".js", ".html",
-        // ".css", ".xml", ".json", ".md", ".sh", ".bat").
 
+        // allowed extensions (e.g., ".txt", ".java", ".py", ".c", ".cpp", ".h", ".js", ".html")
         return extensionsAllowed.contains(fileExtension);
 
     }
@@ -102,6 +101,36 @@ public class Explorer {
         }else{
 //            System.out.println("FILE: " + path.toAbsolutePath());
             Color.out.println(Color.green("  FILE: " + path.toAbsolutePath()));
+        }
+    }
+
+
+    public void saveAllFiles(Path rootDir, Path newRootDir) throws IOException {
+        // Validate that rootDir is a directory
+        assert Files.isDirectory(rootDir) : Color.red(" >>> ERROR: Source path is NOT a directory: " + rootDir);
+
+        // Create the root of the new directory structure if it doesn't exist
+        if (!Files.exists(newRootDir)) {
+            Files.createDirectories(newRootDir);
+        }
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(rootDir)) {
+            for (Path sourcePath : stream) {
+                Path relativePath = rootDir.relativize(sourcePath);
+                Path targetPath = newRootDir.resolve(relativePath);
+
+                if (Files.isDirectory(sourcePath)) {
+                    // Recurse into subdirectory
+                    saveAllFiles(sourcePath, targetPath);
+                } else if (checkProcessableFile(sourcePath)) {
+                    // Ensure parent directories exist
+                    Files.createDirectories(targetPath.getParent());
+                    Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+                    Color.out.println(Color.green("  COPIED: " + sourcePath + " ==> " + targetPath));
+                } else {
+                    Color.out.println(Color.yellow(" SKIPPED: " + sourcePath));
+                }
+            }
         }
     }
 
